@@ -8,7 +8,8 @@
 
 #define SECONDS 1000
 
-char topicname[] = "testtopic/2";
+#define BASE_TOPIC "home/floor0/garage/door/"
+#define STATUS_TOPIC BASE_TOPIC "status"
 
 CooperativeMultitasking tasks;
 Continuation beginWiFiIfNeeded;
@@ -72,11 +73,11 @@ void notifyStatus()
     {
         case PinStatus::HIGH:
             Serial.println("on");
-            mqttclient.publish(topicname, "\"on\"");
+            mqttclient.publish(STATUS_TOPIC, "\"on\"");
             break;
         case PinStatus::LOW:
             Serial.println("off");
-            mqttclient.publish(topicname, "\"off\"");
+            mqttclient.publish(STATUS_TOPIC, "\"off\"");
             break;
         default:
             break;
