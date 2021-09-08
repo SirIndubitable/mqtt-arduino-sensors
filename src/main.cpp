@@ -13,8 +13,8 @@ char topicname[] = "testtopic/2";
 CooperativeMultitasking tasks;
 Continuation beginWiFiIfNeeded;
 Continuation connectMQTTClientIfNeeded;
-Continuation on;
-Continuation off;
+Continuation toggle;
+Continuation notifyStatus;
 
 WiFiSSLClient wificlient;
 PubSubClient mqttclient(wificlient);
@@ -50,7 +50,8 @@ void setup()
     connectMQTTClientIfNeeded();
 
     pinMode(LED_BUILTIN, OUTPUT);
-    tasks.now(on);
+    tasks.now(toggle);
+    tasks.now(notifyStatus);
 }
 
 void loop()
@@ -59,26 +60,29 @@ void loop()
     mqttclient.loop();
 }
 
-void on()
+void toggle()
 {
-    digitalWrite(LED_BUILTIN, HIGH);
-    Serial.println("on");
-    if (mqttclient.connected())
-    {
-        mqttclient.publish(topicname, "\"on\"");
-    }
-    tasks.after(5 * SECONDS, off);
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    tasks.after(5 * SECONDS, toggle);
 }
 
-void off()
+void notifyStatus()
 {
-    digitalWrite(LED_BUILTIN, LOW);
-    Serial.println("off");
-    if (mqttclient.connected())
+    switch (digitalRead(LED_BUILTIN))
     {
-        mqttclient.publish(topicname, "\"off\"");
+        case PinStatus::HIGH:
+            Serial.println("on");
+            mqttclient.publish(topicname, "\"on\"");
+            break;
+        case PinStatus::LOW:
+            Serial.println("off");
+            mqttclient.publish(topicname, "\"off\"");
+            break;
+        default:
+            break;
     }
-    tasks.after(5 * SECONDS, on);
+
+    tasks.after(5 * SECONDS, notifyStatus);
 }
 
 void beginWiFiIfNeeded()
