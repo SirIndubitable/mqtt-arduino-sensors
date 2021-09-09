@@ -1,5 +1,3 @@
-// #include <Client.h>
-// #include <SPI.h>
 #include <TaskScheduler.h>
 #include "common.h"
 #include "secrets.h"
@@ -11,9 +9,9 @@ void toggle();
 void notifyStatus();
 
 Scheduler runner;
-Task mqttTask();
-Task toggleTask(5 * SECONDS, TASK_FOREVER, toggle, &runner, true);
-Task notifyTask(5, TASK_FOREVER, notifyStatus, &runner, true);
+
+Task toggleTask(5 * TASK_SECOND,      TASK_FOREVER, toggle, &runner, true);
+Task notifyTask(5 * TASK_MILLISECOND, TASK_FOREVER, notifyStatus, &runner, true);\
 
 WiFiSSLClient wificlient;
 PubSubClient mqttClient(wificlient);
@@ -24,7 +22,7 @@ void setup()
 
     while (!Serial)
     {
-        delay(1 * SECONDS);
+        delay(1 * TASK_SECOND);
     }
 
     WiFi.setHostname("MyArduino");

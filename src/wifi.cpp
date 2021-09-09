@@ -4,8 +4,8 @@
 void tryConnectWifi();
 void monitorWifi();
 
-Task wifiConnectTask(10 * SECONDS, TASK_FOREVER, tryConnectWifi, &runner, true);
-Task wifiMonitorTask(30 * SECONDS, TASK_FOREVER, monitorWifi,    &runner, false);
+Task wifiConnectTask(10 * TASK_SECOND, TASK_FOREVER, tryConnectWifi, &runner, true);
+Task wifiMonitorTask(30 * TASK_SECOND, TASK_FOREVER, monitorWifi,    &runner, false);
 
 String status_tostring(wl_status_t status)
 {

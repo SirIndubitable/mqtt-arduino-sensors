@@ -6,8 +6,6 @@
 #include <TaskSchedulerDeclarations.h>
 #include <WiFi.h>
 
-#define SECONDS 1000
-
 #define DEBUG true  //set to true for debug output, false for no debug output
 #define DEBUG_SERIAL if (DEBUG) Serial
 

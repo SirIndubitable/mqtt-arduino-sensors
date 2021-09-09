@@ -5,9 +5,9 @@ void waitForWifi();
 void tryConnectMqtt();
 void monitorMqttConnection();
 
-Task waitForWifiTask(1 * SECONDS,  TASK_FOREVER, waitForWifi,           &runner, true);
-Task mqttConnectTask(5 * SECONDS,  TASK_FOREVER, tryConnectMqtt,        &runner, false);
-Task mqttMonitorTask(30 * SECONDS, TASK_FOREVER, monitorMqttConnection, &runner, false);
+Task waitForWifiTask(1 * TASK_SECOND,  TASK_FOREVER, waitForWifi,           &runner, true);
+Task mqttConnectTask(5 * TASK_SECOND,  TASK_FOREVER, tryConnectMqtt,        &runner, false);
+Task mqttMonitorTask(30 * TASK_SECOND, TASK_FOREVER, monitorMqttConnection, &runner, false);
 
 bool mqtt_state_transition()
 {
