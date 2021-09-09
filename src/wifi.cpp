@@ -28,40 +28,48 @@ String status_tostring(wl_status_t status)
     }
 }
 
-void tryConnectWifi()
+bool wifi_state_transition()
 {
     wl_status_t status = (wl_status_t)WiFi.status();
-    DEBUG_TIME();
-    DEBUG_SERIAL.print("[tryConnectWifi] ");
-    DEBUG_SERIAL.println(status_tostring(status));
 
     if (status == wl_status_t::WL_NO_MODULE)
     {
+        DEBUG_TIME();
+        DEBUG_SERIAL.print("ERROR - No Wifi Module");
         wifiConnectTask.disable();
         wifiMonitorTask.disable();
-        return;
+        return true;
     }
-    if (status != wl_status_t::WL_CONNECTED)
-    {
-        WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-    }
-    else
+    if (status == wl_status_t::WL_CONNECTED)
     {
         wifiConnectTask.disable();
-        wifiMonitorTask.enable();
+        return !wifiMonitorTask.enableIfNot();
     }
+
+    wifiMonitorTask.disable();
+    return !wifiConnectTask.enableIfNot();
+}
+
+void tryConnectWifi()
+{
+    DEBUG_TIME();
+    DEBUG_SERIAL.println("Connecting to Wifi");
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    if (wifi_state_transition())
+    {
+        return;
+    }
+
+    DEBUG_TIME();
+    DEBUG_SERIAL.print("ERROR - ");
+    DEBUG_SERIAL.println(status_tostring((wl_status_t)WiFi.status()));
 }
 
 void monitorWifi()
 {
-    wl_status_t status = (wl_status_t)WiFi.status();
-    DEBUG_TIME();
-    DEBUG_SERIAL.print("[monitorWifi] ");
-    DEBUG_SERIAL.println(status_tostring(status));
-
-    if (status != wl_status_t::WL_CONNECTED)
+    if (wifi_state_transition())
     {
-        wifiConnectTask.enable();
-        wifiMonitorTask.disable();
+        DEBUG_TIME();
+        DEBUG_SERIAL.println(status_tostring((wl_status_t)WiFi.status()));
     }
 }

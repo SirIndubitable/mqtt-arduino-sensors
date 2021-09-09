@@ -9,7 +9,7 @@ Task waitForWifiTask(1 * SECONDS,  TASK_FOREVER, waitForWifi,           &runner,
 Task mqttConnectTask(5 * SECONDS,  TASK_FOREVER, tryConnectMqtt,        &runner, false);
 Task mqttMonitorTask(30 * SECONDS, TASK_FOREVER, monitorMqttConnection, &runner, false);
 
-bool state_transition()
+bool mqtt_state_transition()
 {
     // If we have no wifi, go to the waiting for wifi task
     if (WiFi.status() != wl_status_t::WL_CONNECTED)
@@ -35,7 +35,7 @@ bool state_transition()
 
 void waitForWifi()
 {
-    state_transition();
+    mqtt_state_transition();
 }
 
 void tryConnectMqtt()
@@ -44,7 +44,7 @@ void tryConnectMqtt()
     DEBUG_SERIAL.println("Connecting to MQTT");
     mqttClient.connect(MQTT_CLIENT_ID, MQTT_USERNAME, MQTT_PASSWORD);
 
-    if (state_transition())
+    if (mqtt_state_transition())
     {
         return;
     }
@@ -56,5 +56,10 @@ void tryConnectMqtt()
 
 void monitorMqttConnection()
 {
-    state_transition();
+    if (mqtt_state_transition())
+    {
+        DEBUG_TIME();
+        DEBUG_SERIAL.print("mqtt failed, rc=");
+        DEBUG_SERIAL.println(mqttClient.state());
+    }
 }
