@@ -11,7 +11,8 @@
  * MQTT Secrets
  *******************************************************************/
 #define MQTT_HOST ""
-#define MQTT_CLIENT ""
+#define MQTT_PORT
+#define MQTT_CLIENT_ID ""
 #define MQTT_USERNAME ""
 #define MQTT_PASSWORD ""
 
