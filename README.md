@@ -12,9 +12,10 @@ but they should work for any MQTT service.
 2) PlatformIO VSCode plugin
 
 # Setup:
-1) Update `./include/secrets.h` to include your MQTT information and WIFI login information
-2) Call `git update-index --assume-unchanged "./include/secrets.h"` to avoid accidently commiting your secrets
-3) Set the environment to your desired sensor (default is garage_door_sensor)
+1) Add the project inside platfromio plugin
+2) Update `./include/secrets.h` to include your MQTT information and WIFI login information
+3) Call `git update-index --assume-unchanged "./include/secrets.h"` to avoid accidently commiting your secrets
+4) Set the environment to your desired sensor (default is garage_door_sensor)
 
 # Debugging
 Setting DEBUG to true in `./include/common.h` will enable serial debug print statements
