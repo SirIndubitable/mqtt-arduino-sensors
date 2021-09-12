@@ -2,16 +2,20 @@
 #include "common.h"
 #include "secrets.h"
 
-String baseTopic = "home/floor0/garage/door/";
-String statusTopic = baseTopic + "status";
+#ifdef GARAGE_DOOR_SENSOR
+
+#include "garageDoor.h"
+GarageSensor sensor;
+
+#endif
 
 void toggle();
-void notifyStatus();
+void runSensor();
 
 Scheduler runner;
 
 Task toggleTask(5 * TASK_SECOND,      TASK_FOREVER, toggle, &runner, true);
-Task notifyTask(5 * TASK_MILLISECOND, TASK_FOREVER, notifyStatus, &runner, true);\
+Task notifyTask(5 * TASK_MILLISECOND, TASK_FOREVER, runSensor, &runner, true);\
 
 WiFiSSLClient wificlient;
 PubSubClient mqttClient(wificlient);
@@ -46,31 +50,7 @@ void toggle()
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 }
 
-String status_tostring(PinStatus status)
+void runSensor()
 {
-    switch (status)
-    {
-        case PinStatus::HIGH:
-            return "\"on\"";
-        case PinStatus::LOW:
-            return "\"off\"";
-        default:
-            return "\"unknown\"";
-    }
-}
-
-PinStatus lastStatus = PinStatus::CHANGE;
-void notifyStatus()
-{
-    PinStatus curStatus = digitalRead(LED_BUILTIN);
-    if (curStatus == lastStatus)
-    {
-        return;
-    }
-    lastStatus = curStatus;
-
-    String status_str = status_tostring(lastStatus);
-    DEBUG_TIME();
-    DEBUG_SERIAL.println(status_str);
-    mqttClient.publish(statusTopic.c_str(), status_str.c_str());
+    sensor.run();
 }
