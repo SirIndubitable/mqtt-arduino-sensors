@@ -5,7 +5,7 @@
 #ifdef GARAGE_DOOR_SENSOR
 
 #include "garageDoor.h"
-GarageSensor sensor;
+GarageSensor sensor(PIN_A1, PIN_A2);
 
 #endif
 
@@ -14,8 +14,7 @@ void runSensor();
 
 Scheduler runner;
 
-Task toggleTask(5 * TASK_SECOND,      TASK_FOREVER, toggle, &runner, true);
-Task notifyTask(5 * TASK_MILLISECOND, TASK_FOREVER, runSensor, &runner, true);\
+Task notifyTask(5 * TASK_MILLISECOND, TASK_FOREVER, runSensor, &runner, true);
 
 WiFiSSLClient wificlient;
 PubSubClient mqttClient(wificlient);
@@ -29,10 +28,10 @@ void setup()
         delay(1 * TASK_SECOND);
     }
 
+    sensor.init();
+
     WiFi.setHostname("MyArduino");
     mqttClient.setServer(MQTT_HOST, MQTT_PORT);
-
-    pinMode(LED_BUILTIN, OUTPUT);
 
     runner.startNow();
 }
@@ -41,13 +40,6 @@ void loop()
 {
     runner.execute();
     mqttClient.loop();
-}
-
-void toggle()
-{
-    DEBUG_TIME();
-    DEBUG_SERIAL.println("Toggle");
-    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 }
 
 void runSensor()
