@@ -1,23 +1,11 @@
 #include <TaskScheduler.h>
 #include "common.h"
 #include "secrets.h"
+#include "garageDoor.h"
 
 String baseTopic = "home/floor0/garage";
 
-#ifdef GARAGE_DOOR_SENSOR
-
-#include "garageDoor.h"
-GarageSensor sensor(baseTopic, PIN_A1, PIN_A2);
-
-#endif
-
-void toggle();
-void runSensor();
-
 Scheduler runner;
-
-Task notifyTask(500 * TASK_MILLISECOND, TASK_FOREVER, runSensor, &runner, true);
-
 WiFiSSLClient wificlient;
 PubSubClient mqttClient(wificlient);
 
@@ -44,7 +32,15 @@ void loop()
     mqttClient.loop();
 }
 
-void runSensor()
+#ifdef GARAGE_DOOR_SENSOR
+
+GarageSensor sensor(baseTopic, PIN_A1, PIN_A2);
+
+void run_garage_door()
 {
     sensor.run();
 }
+
+Task notifyTask(500 * TASK_MILLISECOND, TASK_FOREVER, run_garage_door, &runner, true);
+
+#endif

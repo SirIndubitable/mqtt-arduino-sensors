@@ -1,3 +1,4 @@
+#ifdef GARAGE_DOOR_SENSOR
 #include <Arduino.h>
 #include "common.h"
 #include "garageDoor.h"
@@ -92,3 +93,4 @@ GargeSensorState GarageSensor::get_new_state()
 
     return GargeSensorState::Unknown;
 }
+#endif
