@@ -3,10 +3,6 @@
 #include "garageDoor.h"
 
 
-String baseTopic = "home/floor0/garage/door/";
-String statusTopic = baseTopic + "status";
-
-
 String status_tostring(GargeSensorState status)
 {
     switch (status)
@@ -27,8 +23,9 @@ String status_tostring(GargeSensorState status)
     }
 }
 
-GarageSensor::GarageSensor(uint32_t open_limit_pin, uint32_t close_limit_pin)
+GarageSensor::GarageSensor(String base_topic, uint32_t open_limit_pin, uint32_t close_limit_pin)
 {
+    this->topic = base_topic + "door/status";
     this->state = GargeSensorState::Initializing;
     this->open_limit_pin = open_limit_pin;
     this->close_limit_pin = close_limit_pin;
@@ -52,7 +49,7 @@ void GarageSensor::run()
     String status_str = status_tostring(new_state);
 
     // Only change the actual state if it was succesffully published
-    if (mqttClient.publish(statusTopic.c_str(), status_str.c_str(), true))
+    if (mqttClient.publish(this->topic.c_str(), status_str.c_str(), true))
     {
         DEBUG_TIME();
         DEBUG_SERIAL.println(status_str);

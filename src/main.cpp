@@ -2,10 +2,12 @@
 #include "common.h"
 #include "secrets.h"
 
+String baseTopic = "home/floor0/garage";
+
 #ifdef GARAGE_DOOR_SENSOR
 
 #include "garageDoor.h"
-GarageSensor sensor(PIN_A1, PIN_A2);
+GarageSensor sensor(baseTopic, PIN_A1, PIN_A2);
 
 #endif
 
@@ -14,7 +16,7 @@ void runSensor();
 
 Scheduler runner;
 
-Task notifyTask(5 * TASK_MILLISECOND, TASK_FOREVER, runSensor, &runner, true);
+Task notifyTask(500 * TASK_MILLISECOND, TASK_FOREVER, runSensor, &runner, true);
 
 WiFiSSLClient wificlient;
 PubSubClient mqttClient(wificlient);
