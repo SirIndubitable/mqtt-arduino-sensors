@@ -24,9 +24,9 @@ String status_tostring(GargeSensorState status)
     }
 }
 
-GarageSensor::GarageSensor(String base_topic, uint32_t open_limit_pin, uint32_t close_limit_pin)
+GarageSensor::GarageSensor(uint32_t open_limit_pin, uint32_t close_limit_pin)
 {
-    this->topic = base_topic + "door/status";
+    this->topic = baseTopic + "/door/status";
     this->state = GargeSensorState::Initializing;
     this->open_limit_pin = open_limit_pin;
     this->close_limit_pin = close_limit_pin;

@@ -78,6 +78,7 @@ void monitorWifi()
         String rssi_topic = baseTopic + "/wifi/rssi";
         char rssi[12];
         itoa(WiFi.RSSI(), rssi, 10);
+        DEBUG_TIME();
         DEBUG_SERIAL.print("Wifi RSSI: ");
         DEBUG_SERIAL.print(rssi);
         DEBUG_SERIAL.println(" dBm");

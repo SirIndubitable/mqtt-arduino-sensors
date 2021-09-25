@@ -21,7 +21,7 @@ class GarageSensor
         uint32_t close_limit_pin;
         GargeSensorState get_new_state();
     public:
-        GarageSensor(String base_topic, uint32_t open_limit_pin, uint32_t close_limit_pin);
+        GarageSensor(uint32_t open_limit_pin, uint32_t close_limit_pin);
         void init();
         void run();
 };
