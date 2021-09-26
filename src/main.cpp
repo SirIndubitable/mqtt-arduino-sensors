@@ -1,8 +1,13 @@
+#define _TASK_OO_CALLBACKS
+
 #include <TaskScheduler.h>
+#include <WiFi.h>
 #include "common.h"
 #include "secrets.h"
 #include "garageDoor.h"
 #include "DHT.h"
+
+#include "wifiTask.h"
 
 #ifdef GARAGE_DOOR_SENSOR
 GarageSensor garage_sensor(PIN_A1, PIN_A7);
@@ -17,6 +22,8 @@ Scheduler runner;
 //WiFiSSLClient wificlient;
 WiFiClient wificlient;
 PubSubClient mqttClient(wificlient);
+
+WifiTask wifi(&runner);
 
 void setup()
 {
@@ -35,7 +42,7 @@ void setup()
     temp_sensor.begin();
     #endif
 
-    WiFi.setHostname("MyArduino");
+    wifi.Init("MyArduino");
     mqttClient.setServer(MQTT_HOST, MQTT_PORT);
 
     runner.startNow();
