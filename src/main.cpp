@@ -16,7 +16,6 @@ DHT temp_sensor(4u, DHT22);
 
 String baseTopic = String(SENSOR_MQTT_LOCATION) + "/" + SENSOR_UNIQUE_NAME;
 Scheduler runner;
-//WiFiSSLClient wificlient;
 WiFiClient wificlient;
 PubSubClient mqttClient(wificlient);
 
