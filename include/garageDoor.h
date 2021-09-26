@@ -1,4 +1,3 @@
-#ifdef GARAGE_DOOR_SENSOR
 #ifndef __GARAGE_DOOR_H__
 #define __GARAGE_DOOR_H__
 
@@ -23,5 +22,4 @@ class GarageSensor : public Task
         GargeSensorState get_new_state();
 };
 
-#endif
 #endif

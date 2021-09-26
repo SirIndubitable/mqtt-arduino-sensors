@@ -4,7 +4,6 @@
 #include <WiFi.h>
 #include "common.h"
 #include "secrets.h"
-#include "garageDoor.h"
 #include "DHT.h"
 
 #include "WifiConnectionService.h"
@@ -23,6 +22,8 @@ WifiConnectionService wifiService(&runner);
 MqttConnectionService mqttService(&runner, &wifiService, &mqttClient);
 
 #ifdef GARAGE_DOOR_SENSOR
+#include "garageDoor.h"
+
 GarageSensor garage_sensor(&runner, PIN_A1, PIN_A7);
 #endif
 
