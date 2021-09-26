@@ -4,12 +4,10 @@
 #include <WiFi.h>
 #include "common.h"
 #include "secrets.h"
-#include "DHT.h"
 
 #include "WifiConnectionService.h"
 #include "MqttConnectionService.h"
 
-String baseTopic = String(SENSOR_MQTT_LOCATION) + "/" + SENSOR_UNIQUE_NAME;
 Scheduler runner;
 WiFiClient wificlient;
 PubSubClient mqttClient(wificlient);

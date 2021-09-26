@@ -1,5 +1,4 @@
 #include "common.h"
-#include "secrets.h"
 #include "MqttConnectionService.h"
 
 enum class MqttConnectionServiceState
