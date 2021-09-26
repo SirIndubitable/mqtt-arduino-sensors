@@ -1,8 +1,8 @@
 #include "common.h"
 #include "secrets.h"
-#include "mqttTask.h"
+#include "MqttConnectionService.h"
 
-enum class MqttTaskState
+enum class MqttConnectionServiceState
 {
     NotInitialized,
     Error,
@@ -11,15 +11,15 @@ enum class MqttTaskState
     WaitingForWifi
 };
 
-MqttTask::MqttTask(Scheduler* aScheduler, WifiConnectionService* wifiService, PubSubClient* mqttClient)
+MqttConnectionService::MqttConnectionService(Scheduler* aScheduler, WifiConnectionService* wifiService, PubSubClient* mqttClient)
 : Task(TASK_IMMEDIATE, TASK_ONCE, aScheduler, false)
 {
-    this->state = MqttTaskState::NotInitialized;
+    this->state = MqttConnectionServiceState::NotInitialized;
     this->wifiService = wifiService;
     this->mqttClient = mqttClient;
 }
 
-void MqttTask::Init(const char* hostname, uint8_t port, const char* client_id, const char* username, const char* password)
+void MqttConnectionService::Init(const char* hostname, uint8_t port, const char* client_id, const char* username, const char* password)
 {
     this->mqttClient->setServer(hostname, port);
     this->client_id = client_id;
@@ -27,17 +27,17 @@ void MqttTask::Init(const char* hostname, uint8_t port, const char* client_id, c
     this->password = password;
 }
 
-bool MqttTask::Callback()
+bool MqttConnectionService::Callback()
 {
     switch (this->state)
     {
-        case MqttTaskState::Connected:
+        case MqttConnectionServiceState::Connected:
             this->monitor();
             break;
-        case MqttTaskState::Connecting:
+        case MqttConnectionServiceState::Connecting:
             this->tryConnect();
             break;
-        case MqttTaskState::WaitingForWifi:
+        case MqttConnectionServiceState::WaitingForWifi:
             this->waitForWifi();
             break;
         default:
@@ -47,21 +47,21 @@ bool MqttTask::Callback()
     return true;
 }
 
-MqttTaskState MqttTask::getNewState()
+MqttConnectionServiceState MqttConnectionService::getNewState()
 {
     if (!this->wifiService->IsConnected())
     {
-        return MqttTaskState::WaitingForWifi;
+        return MqttConnectionServiceState::WaitingForWifi;
     }
     if (this->mqttClient->connected())
     {
-        return MqttTaskState::Connected;
+        return MqttConnectionServiceState::Connected;
     }
 
-    return MqttTaskState::Connecting;
+    return MqttConnectionServiceState::Connecting;
 }
 
-bool MqttTask::stateTransition()
+bool MqttConnectionService::stateTransition()
 {
     auto newState = this->getNewState();
     if (this->state == newState)
@@ -72,17 +72,17 @@ bool MqttTask::stateTransition()
     this->state = newState;
     switch (this->state)
     {
-        case MqttTaskState::Connected:
+        case MqttConnectionServiceState::Connected:
             this->setInterval(30 * TASK_SECOND);
             this->setIterations(TASK_FOREVER);
             this->enableIfNot();
             break;
-        case MqttTaskState::Connecting:
+        case MqttConnectionServiceState::Connecting:
             this->setInterval(5 * TASK_SECOND);
             this->setIterations(TASK_FOREVER);
             this->enableIfNot();
             break;
-        case MqttTaskState::WaitingForWifi:
+        case MqttConnectionServiceState::WaitingForWifi:
             this->setInterval(1 * TASK_SECOND);
             this->setIterations(TASK_FOREVER);
             this->enableIfNot();
@@ -95,12 +95,12 @@ bool MqttTask::stateTransition()
     return true;
 }
 
-void MqttTask::waitForWifi()
+void MqttConnectionService::waitForWifi()
 {
     this->stateTransition();
 }
 
-void MqttTask::tryConnect()
+void MqttConnectionService::tryConnect()
 {
     DEBUG_TIME();
     DEBUG_SERIAL.println("Connecting to MQTT");
@@ -118,7 +118,7 @@ void MqttTask::tryConnect()
     DEBUG_SERIAL.println(this->mqttClient->state());
 }
 
-void MqttTask::monitor()
+void MqttConnectionService::monitor()
 {
     if (this->stateTransition())
     {

@@ -8,7 +8,7 @@
 #include "DHT.h"
 
 #include "WifiConnectionService.h"
-#include "mqttTask.h"
+#include "MqttConnectionService.h"
 
 #ifdef TEMPERATURE_SENSOR
 DHT temp_sensor(4u, DHT22);
@@ -20,7 +20,7 @@ WiFiClient wificlient;
 PubSubClient mqttClient(wificlient);
 
 WifiConnectionService wifiService(&runner);
-MqttTask mqtt(&runner, &wifiService, &mqttClient);
+MqttConnectionService mqttService(&runner, &wifiService, &mqttClient);
 
 #ifdef GARAGE_DOOR_SENSOR
 GarageSensor garage_sensor(&runner, PIN_A1, PIN_A7);
@@ -44,7 +44,7 @@ void setup()
     #endif
 
     wifiService.Init("MyArduino");
-    mqtt.Init(MQTT_HOST, MQTT_PORT, MQTT_CLIENT_ID, MQTT_USERNAME, MQTT_PASSWORD);
+    mqttService.Init(MQTT_HOST, MQTT_PORT, MQTT_CLIENT_ID, MQTT_USERNAME, MQTT_PASSWORD);
 
     runner.startNow();
 }
