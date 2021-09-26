@@ -1,18 +1,18 @@
 #ifndef __CLIMATESENSOR_H__
 #define __CLIMATESENSOR_H__
 
-#define _TASK_OO_CALLBACKS
-
 #include <Arduino.h>
-#include <TaskSchedulerDeclarations.h>
+#include "MqttSensor.h"
 #include "DHT.h"
 
-class ClimateSensor : public Task
+class ClimateSensor : public MqttSensor
 {
     public:
-        ClimateSensor(Scheduler* aScheduler, uint8_t pin, uint8_t dhtType);
+        ClimateSensor(Scheduler* aScheduler, PubSubClient* mqttClient, uint8_t pin, uint8_t dhtType);
         void Init();
-        bool Callback();
+    protected:
+        uint32_t OnMqttConnected();
+        void ReadAndPublish();
     private:
         DHT tempSensor;
 };

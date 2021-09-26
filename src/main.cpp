@@ -20,13 +20,13 @@ MqttConnectionService mqttService(&runner, &wifiService, &mqttClient);
 #ifdef GARAGE_DOOR_SENSOR
 #include "GarageDoorSensor.h"
 
-GarageDoorSensor garage_sensor(&runner, PIN_A1, PIN_A7);
+GarageDoorSensor garage_sensor(&runner, &mqttClient, PIN_A1, PIN_A7);
 #endif
 
 #ifdef TEMPERATURE_SENSOR
 #include "ClimateSensor.h"
 
-DHT climate_sensor(4u, DHT22);
+ClimateSensor climate_sensor(&runner, &mqttClient, 4u, DHT22);
 #endif
 
 void setup()
