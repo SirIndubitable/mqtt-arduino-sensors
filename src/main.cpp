@@ -29,6 +29,12 @@ GarageDoorSensor garage_sensor(&runner, &mqttClient, PIN_A1, PIN_A7);
 ClimateSensor climate_sensor(&runner, &mqttClient, 4u, DHT22);
 #endif
 
+#ifdef PUBLISH_WIFI_RSSI
+#include "WifiRssiSensor.h"
+
+WifiRssiSensor wifi_sensor(&runner, &mqttClient);
+#endif
+
 void setup()
 {
     Serial.begin(9600);
