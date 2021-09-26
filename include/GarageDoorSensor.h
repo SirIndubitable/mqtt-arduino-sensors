@@ -6,20 +6,20 @@
 #include <Arduino.h>
 #include <TaskSchedulerDeclarations.h>
 
-enum class GargeSensorState;
+enum class GarageDoorSensorState;
 
-class GarageSensor : public Task
+class GarageDoorSensor : public Task
 {
     public:
-        GarageSensor(Scheduler* aScheduler, uint32_t open_limit_pin, uint32_t close_limit_pin);
+        GarageDoorSensor(Scheduler* aScheduler, uint32_t open_limit_pin, uint32_t close_limit_pin);
         void init();
         bool Callback();
     private:
-        GargeSensorState state;
+        GarageDoorSensorState state;
         String topic;
         uint32_t open_limit_pin;
         uint32_t close_limit_pin;
-        GargeSensorState get_new_state();
+        GarageDoorSensorState get_new_state();
 };
 
 #endif

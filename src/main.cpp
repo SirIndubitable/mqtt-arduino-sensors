@@ -22,9 +22,9 @@ WifiConnectionService wifiService(&runner);
 MqttConnectionService mqttService(&runner, &wifiService, &mqttClient);
 
 #ifdef GARAGE_DOOR_SENSOR
-#include "garageDoor.h"
+#include "GarageDoorSensor.h"
 
-GarageSensor garage_sensor(&runner, PIN_A1, PIN_A7);
+GarageDoorSensor garage_sensor(&runner, PIN_A1, PIN_A7);
 #endif
 
 void setup()

@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include "common.h"
-#include "garageDoor.h"
+#include "GarageDoorSensor.h"
 
-enum class GargeSensorState
+enum class GarageDoorSensorState
 {
     Closed,
     Closing,
@@ -12,45 +12,45 @@ enum class GargeSensorState
     Initializing
 };
 
-String status_tostring(GargeSensorState status)
+String status_tostring(GarageDoorSensorState status)
 {
     switch (status)
     {
-        case GargeSensorState::Closed:
+        case GarageDoorSensorState::Closed:
             return "\"closed\"";
-        case GargeSensorState::Closing:
+        case GarageDoorSensorState::Closing:
             return "\"closing\"";
-        case GargeSensorState::Opened:
+        case GarageDoorSensorState::Opened:
             return "\"opened\"";
-        case GargeSensorState::Opening:
+        case GarageDoorSensorState::Opening:
             return "\"opening\"";
-        case GargeSensorState::Initializing:
+        case GarageDoorSensorState::Initializing:
             return "\"initializing\"";
-        case GargeSensorState::Unknown:
+        case GarageDoorSensorState::Unknown:
         default:
             return "\"unknown\"";
     }
 }
 
-GarageSensor::GarageSensor(Scheduler* aScheduler, uint32_t open_limit_pin, uint32_t close_limit_pin)
+GarageDoorSensor::GarageDoorSensor(Scheduler* aScheduler, uint32_t open_limit_pin, uint32_t close_limit_pin)
     : Task(500 * TASK_MILLISECOND, TASK_FOREVER, aScheduler, true)
 {
     this->topic = baseTopic + "/door/status";
-    this->state = GargeSensorState::Initializing;
+    this->state = GarageDoorSensorState::Initializing;
     this->open_limit_pin = open_limit_pin;
     this->close_limit_pin = close_limit_pin;
 }
 
-void GarageSensor::init()
+void GarageDoorSensor::init()
 {
     pinMode(this->open_limit_pin, PinMode::INPUT);
     pinMode(this->open_limit_pin, PinMode::INPUT);
 }
 
-bool GarageSensor::Callback()
+bool GarageDoorSensor::Callback()
 {
     // No need to publish a new value if nothing changed
-    GargeSensorState new_state = get_new_state();
+    GarageDoorSensorState new_state = get_new_state();
     if (this->state == new_state)
     {
         return true;
@@ -70,7 +70,7 @@ bool GarageSensor::Callback()
 }
 
 
-GargeSensorState GarageSensor::get_new_state()
+GarageDoorSensorState GarageDoorSensor::get_new_state()
 {
     PinStatus close_limit = digitalRead(this->close_limit_pin);
     PinStatus open_limit = digitalRead(this->open_limit_pin);
@@ -82,25 +82,25 @@ GargeSensorState GarageSensor::get_new_state()
 
     if (close_switch_active && !open_switch_active)
     {
-        return GargeSensorState::Closed;
+        return GarageDoorSensorState::Closed;
     }
     if (open_switch_active && !close_switch_active)
     {
-        return GargeSensorState::Opened;
+        return GarageDoorSensorState::Opened;
     }
     if (!close_switch_active && !open_switch_active)
     {
-        if (this->state == GargeSensorState::Opened
-         || this->state == GargeSensorState::Closing)
+        if (this->state == GarageDoorSensorState::Opened
+         || this->state == GarageDoorSensorState::Closing)
         {
-            return GargeSensorState::Closing;
+            return GarageDoorSensorState::Closing;
         }
-        if (this->state == GargeSensorState::Closed
-         || this->state == GargeSensorState::Opening)
+        if (this->state == GarageDoorSensorState::Closed
+         || this->state == GarageDoorSensorState::Opening)
         {
-            return GargeSensorState::Opening;
+            return GarageDoorSensorState::Opening;
         }
     }
 
-    return GargeSensorState::Unknown;
+    return GarageDoorSensorState::Unknown;
 }
