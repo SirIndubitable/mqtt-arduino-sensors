@@ -2,73 +2,82 @@
 #include "common.h"
 #include "GarageDoorSensor.h"
 
+#ifndef SENSOR_UNIQUE_NAME
+#define SENSOR_UNIQUE_NAME "example-name"
+#endif
+
+#define GDOOR_STATE_TOPIC "homeassistant/binary-sensor/" SENSOR_UNIQUE_NAME "-gdoor/state"
+#define STATE_DATA_FORMAT "{ \"moving\": %s, \"garage_door\": %s }"
+
+#define OPEN_CONFIG_TOPIC "homeassistant/binary-sensor/" SENSOR_UNIQUE_NAME "-open/config"
+#define OPEN_CONFIG_DATA \
+"{ " \
+"\"name\": \"Garage Door Open\", " \
+"\"dev_cla\": \"garage_door\", " \
+"\"stat_t\": \"" GDOOR_STATE_TOPIC "\", " \
+"\"val_tpl\": \"{{ value_json.garage_door }}\" " \
+"}"
+
+#define MOVING_CONFIG_TOPIC "homeassistant/binary-sensor/" SENSOR_UNIQUE_NAME "-moving/config"
+#define MOVING_CONFIG_DATA \
+"{ " \
+"\"name\": \"Garage Door Moving\", " \
+"\"dev_cla\": \"moving\", " \
+"\"stat_t\": \"" GDOOR_STATE_TOPIC "\", " \
+"\"val_tpl\": \"{{ value_json.moving }}\" " \
+"}"
+
 enum class GarageDoorSensorState
 {
-    Closed,
-    Closing,
     Opened,
-    Opening,
-    Unknown,
-    Initializing
+    Moving,
+    Closed,
+    Unknown
 };
 
-String status_tostring(GarageDoorSensorState status)
+GarageDoorSensor::GarageDoorSensor(Scheduler* aScheduler, PubSubClient* mqttClient, uint32_t open_limit_pin, uint32_t close_limit_pin)
+    : MqttSensor(aScheduler, mqttClient)
 {
-    switch (status)
-    {
-        case GarageDoorSensorState::Closed:
-            return "\"closed\"";
-        case GarageDoorSensorState::Closing:
-            return "\"closing\"";
-        case GarageDoorSensorState::Opened:
-            return "\"opened\"";
-        case GarageDoorSensorState::Opening:
-            return "\"opening\"";
-        case GarageDoorSensorState::Initializing:
-            return "\"initializing\"";
-        case GarageDoorSensorState::Unknown:
-        default:
-            return "\"unknown\"";
-    }
-}
-
-GarageDoorSensor::GarageDoorSensor(Scheduler* aScheduler, uint32_t open_limit_pin, uint32_t close_limit_pin)
-    : Task(500 * TASK_MILLISECOND, TASK_FOREVER, aScheduler, true)
-{
-    this->topic = baseTopic + "/door/status";
-    this->state = GarageDoorSensorState::Initializing;
+    this->door_state = GarageDoorSensorState::Unknown;
     this->open_limit_pin = open_limit_pin;
     this->close_limit_pin = close_limit_pin;
 }
 
-void GarageDoorSensor::init()
+void GarageDoorSensor::Init()
 {
     pinMode(this->open_limit_pin, PinMode::INPUT);
     pinMode(this->open_limit_pin, PinMode::INPUT);
 }
 
-bool GarageDoorSensor::Callback()
+uint32_t GarageDoorSensor::OnMqttConnected()
+{
+    this->door_state = GarageDoorSensorState::Unknown;
+    this->PublishMessage(OPEN_CONFIG_TOPIC, OPEN_CONFIG_DATA);
+    this->PublishMessage(MOVING_CONFIG_TOPIC, MOVING_CONFIG_DATA);
+
+    return 500 * TASK_MILLISECOND;
+}
+
+void GarageDoorSensor::ReadAndPublish()
 {
     // No need to publish a new value if nothing changed
-    GarageDoorSensorState new_state = get_new_state();
-    if (this->state == new_state)
+    auto new_state = get_new_state();
+    if (this->door_state == new_state)
     {
-        return true;
+        return;
     }
 
-    String status_str = status_tostring(new_state);
+    this->door_state = new_state;
 
-    // Only change the actual state if it was succesffully published
-    if (mqttClient.publish(this->topic.c_str(), status_str.c_str(), true))
-    {
-        DEBUG_TIME();
-        DEBUG_SERIAL.println(status_str);
-        this->state = new_state;
-    }
+    // Because we consider it open when it's moving and when it's open, check not closed
+    const char* open = this->door_state != GarageDoorSensorState::Closed ? "true" : "false";
+    const char* moving = this->door_state == GarageDoorSensorState::Moving ? "true" : "false";
 
-    return true;
+    char payload[42];
+    snprintf_P(payload, sizeof(payload), STATE_DATA_FORMAT, moving, open);
+
+    this->PublishMessage(GDOOR_STATE_TOPIC, payload);
 }
-
 
 GarageDoorSensorState GarageDoorSensor::get_new_state()
 {
@@ -90,16 +99,7 @@ GarageDoorSensorState GarageDoorSensor::get_new_state()
     }
     if (!close_switch_active && !open_switch_active)
     {
-        if (this->state == GarageDoorSensorState::Opened
-         || this->state == GarageDoorSensorState::Closing)
-        {
-            return GarageDoorSensorState::Closing;
-        }
-        if (this->state == GarageDoorSensorState::Closed
-         || this->state == GarageDoorSensorState::Opening)
-        {
-            return GarageDoorSensorState::Opening;
-        }
+        return GarageDoorSensorState::Moving;
     }
 
     return GarageDoorSensorState::Unknown;

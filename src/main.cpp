@@ -39,7 +39,7 @@ void setup()
     }
 
     #ifdef GARAGE_DOOR_SENSOR
-    garage_sensor.init();
+    garage_sensor.Init();
     #endif
 
     #ifdef TEMPERATURE_SENSOR
