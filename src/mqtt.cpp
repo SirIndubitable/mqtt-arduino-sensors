@@ -11,11 +11,11 @@ enum class MqttTaskState
     WaitingForWifi
 };
 
-MqttTask::MqttTask(Scheduler* aScheduler, WifiTask* wifiTask, PubSubClient* mqttClient)
+MqttTask::MqttTask(Scheduler* aScheduler, WifiConnectionService* wifiService, PubSubClient* mqttClient)
 : Task(TASK_IMMEDIATE, TASK_ONCE, aScheduler, false)
 {
     this->state = MqttTaskState::NotInitialized;
-    this->wifiTask = wifiTask;
+    this->wifiService = wifiService;
     this->mqttClient = mqttClient;
 }
 
@@ -49,7 +49,7 @@ bool MqttTask::Callback()
 
 MqttTaskState MqttTask::getNewState()
 {
-    if (!this->wifiTask->IsConnected())
+    if (!this->wifiService->IsConnected())
     {
         return MqttTaskState::WaitingForWifi;
     }

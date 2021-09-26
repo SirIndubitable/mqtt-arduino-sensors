@@ -7,7 +7,7 @@
 #include "garageDoor.h"
 #include "DHT.h"
 
-#include "wifiTask.h"
+#include "WifiConnectionService.h"
 #include "mqttTask.h"
 
 #ifdef TEMPERATURE_SENSOR
@@ -19,8 +19,8 @@ Scheduler runner;
 WiFiClient wificlient;
 PubSubClient mqttClient(wificlient);
 
-WifiTask wifi(&runner);
-MqttTask mqtt(&runner, &wifi, &mqttClient);
+WifiConnectionService wifiService(&runner);
+MqttTask mqtt(&runner, &wifiService, &mqttClient);
 
 #ifdef GARAGE_DOOR_SENSOR
 GarageSensor garage_sensor(&runner, PIN_A1, PIN_A7);
@@ -43,7 +43,7 @@ void setup()
     temp_sensor.begin();
     #endif
 
-    wifi.Init("MyArduino");
+    wifiService.Init("MyArduino");
     mqtt.Init(MQTT_HOST, MQTT_PORT, MQTT_CLIENT_ID, MQTT_USERNAME, MQTT_PASSWORD);
 
     runner.startNow();

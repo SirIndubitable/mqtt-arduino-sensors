@@ -1,9 +1,9 @@
 #include <WiFi.h>
-#include "wifiTask.h"
+#include "WifiConnectionService.h"
 #include "common.h"
 #include "secrets.h"
 
-enum class WifiTaskState
+enum class WifiConnectionServiceState
 {
     NotInitialized,
     Error,
@@ -11,18 +11,18 @@ enum class WifiTaskState
     Connecting
 };
 
-WifiTaskState statusToState(uint8_t status)
+WifiConnectionServiceState statusToState(uint8_t status)
 {
     switch ((wl_status_t)status)
     {
         case wl_status_t::WL_NO_MODULE:
-            return WifiTaskState::Error;
+            return WifiConnectionServiceState::Error;
 
         case wl_status_t::WL_CONNECTED:
-            return WifiTaskState::Connected;
+            return WifiConnectionServiceState::Connected;
 
         default:
-            return WifiTaskState::Connecting;
+            return WifiConnectionServiceState::Connecting;
     }
 }
 
@@ -47,30 +47,31 @@ String statusToString(uint8_t status)
     }
 }
 
-WifiTask::WifiTask(Scheduler* aScheduler) : Task(TASK_IMMEDIATE, TASK_ONCE, aScheduler, false)
+WifiConnectionService::WifiConnectionService(Scheduler* aScheduler)
+    : Task(TASK_IMMEDIATE, TASK_ONCE, aScheduler, false)
 {
-    this->state = WifiTaskState::NotInitialized;
+    this->state = WifiConnectionServiceState::NotInitialized;
 }
 
-void WifiTask::Init(String hostname)
+void WifiConnectionService::Init(String hostname)
 {
     WiFi.setHostname("MyArduino");
     this->stateTransition(WiFi.status());
 }
 
-bool WifiTask::IsConnected()
+bool WifiConnectionService::IsConnected()
 {
     return WiFi.status() == wl_status_t::WL_CONNECTED;
 }
 
-bool WifiTask::Callback()
+bool WifiConnectionService::Callback()
 {
     switch (this->state)
     {
-        case WifiTaskState::Connected:
+        case WifiConnectionServiceState::Connected:
             this->monitor();
             break;
-        case WifiTaskState::Connecting:
+        case WifiConnectionServiceState::Connecting:
             this->tryConnect();
             break;
         default:
@@ -80,7 +81,7 @@ bool WifiTask::Callback()
     return true;
 }
 
-bool WifiTask::stateTransition(uint8_t wifiStatus)
+bool WifiConnectionService::stateTransition(uint8_t wifiStatus)
 {
     auto newState = statusToState((wl_status_t)wifiStatus);
     if (this->state == newState)
@@ -91,12 +92,12 @@ bool WifiTask::stateTransition(uint8_t wifiStatus)
     this->state = newState;
     switch (this->state)
     {
-        case WifiTaskState::Connected:
+        case WifiConnectionServiceState::Connected:
             this->setInterval(30 * TASK_SECOND);
             this->setIterations(TASK_FOREVER);
             this->enableIfNot();
             break;
-        case WifiTaskState::Connecting:
+        case WifiConnectionServiceState::Connecting:
             this->setInterval(10 * TASK_SECOND);
             this->setIterations(TASK_FOREVER);
             this->enableIfNot();
@@ -109,7 +110,7 @@ bool WifiTask::stateTransition(uint8_t wifiStatus)
     return true;
 }
 
-void WifiTask::tryConnect()
+void WifiConnectionService::tryConnect()
 {
     DEBUG_TIME();
     DEBUG_SERIAL.println("Connecting to Wifi");
@@ -126,7 +127,7 @@ void WifiTask::tryConnect()
     DEBUG_SERIAL.println(statusToString(status));
 }
 
-void WifiTask::monitor()
+void WifiConnectionService::monitor()
 {
     auto status = WiFi.status();
     if (this->stateTransition(status))

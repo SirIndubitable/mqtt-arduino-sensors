@@ -6,19 +6,19 @@
 #include <Arduino.h>
 #include <TaskSchedulerDeclarations.h>
 #include <PubSubClient.h>
-#include "wifiTask.h"
+#include "WifiConnectionService.h"
 
 enum class MqttTaskState;
 
 class MqttTask : public Task
 {
     public:
-        MqttTask(Scheduler* aScheduler, WifiTask* wifiTask, PubSubClient* mqttClient);
+        MqttTask(Scheduler* aScheduler, WifiConnectionService* wifiService, PubSubClient* mqttClient);
         void Init(const char* hostname, uint8_t port, const char* client_id, const char* username, const char* password);
         bool Callback();
     private:
         PubSubClient* mqttClient;
-        WifiTask* wifiTask;
+        WifiConnectionService* wifiService;
         MqttTaskState state;
         const char* client_id;
         const char* username;
