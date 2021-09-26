@@ -3,6 +3,15 @@
 #include "common.h"
 #include "garageDoor.h"
 
+enum class GargeSensorState
+{
+    Closed,
+    Closing,
+    Opened,
+    Opening,
+    Unknown,
+    Initializing
+};
 
 String status_tostring(GargeSensorState status)
 {
@@ -24,7 +33,8 @@ String status_tostring(GargeSensorState status)
     }
 }
 
-GarageSensor::GarageSensor(uint32_t open_limit_pin, uint32_t close_limit_pin)
+GarageSensor::GarageSensor(Scheduler* aScheduler, uint32_t open_limit_pin, uint32_t close_limit_pin)
+    : Task(500 * TASK_MILLISECOND, TASK_FOREVER, aScheduler, true)
 {
     this->topic = baseTopic + "/door/status";
     this->state = GargeSensorState::Initializing;
@@ -38,13 +48,13 @@ void GarageSensor::init()
     pinMode(this->open_limit_pin, PinMode::INPUT);
 }
 
-void GarageSensor::run()
+bool GarageSensor::Callback()
 {
     // No need to publish a new value if nothing changed
     GargeSensorState new_state = get_new_state();
     if (this->state == new_state)
     {
-        return;
+        return true;
     }
 
     String status_str = status_tostring(new_state);
@@ -56,6 +66,8 @@ void GarageSensor::run()
         DEBUG_SERIAL.println(status_str);
         this->state = new_state;
     }
+
+    return true;
 }
 
 

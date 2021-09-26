@@ -10,10 +10,6 @@
 #include "wifiTask.h"
 #include "mqttTask.h"
 
-#ifdef GARAGE_DOOR_SENSOR
-GarageSensor garage_sensor(PIN_A1, PIN_A7);
-#endif
-
 #ifdef TEMPERATURE_SENSOR
 DHT temp_sensor(4u, DHT22);
 #endif
@@ -26,6 +22,10 @@ PubSubClient mqttClient(wificlient);
 
 WifiTask wifi(&runner);
 MqttTask mqtt(&runner, &wifi, &mqttClient);
+
+#ifdef GARAGE_DOOR_SENSOR
+GarageSensor garage_sensor(&runner, PIN_A1, PIN_A7);
+#endif
 
 void setup()
 {
@@ -55,17 +55,6 @@ void loop()
     runner.execute();
     mqttClient.loop();
 }
-
-#ifdef GARAGE_DOOR_SENSOR
-
-void run_garage_door()
-{
-    garage_sensor.run();
-}
-
-Task garageDoorTask(500 * TASK_MILLISECOND, TASK_FOREVER, run_garage_door, &runner, true);
-
-#endif
 
 #ifdef TEMPERATURE_SENSOR
 void run_temp_sensor();
