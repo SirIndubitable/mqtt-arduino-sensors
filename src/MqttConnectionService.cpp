@@ -12,7 +12,7 @@ enum class MqttConnectionServiceState
 };
 
 MqttConnectionService::MqttConnectionService(Scheduler* aScheduler, WifiConnectionService* wifiService, PubSubClient* mqttClient)
-: Task(TASK_IMMEDIATE, TASK_ONCE, aScheduler, false)
+: Task(TASK_IMMEDIATE, TASK_FOREVER, aScheduler, false)
 {
     this->state = MqttConnectionServiceState::NotInitialized;
     this->wifiService = wifiService;
@@ -74,17 +74,14 @@ bool MqttConnectionService::stateTransition()
     {
         case MqttConnectionServiceState::Connected:
             this->setInterval(30 * TASK_SECOND);
-            this->setIterations(TASK_FOREVER);
             this->enableIfNot();
             break;
         case MqttConnectionServiceState::Connecting:
             this->setInterval(5 * TASK_SECOND);
-            this->setIterations(TASK_FOREVER);
             this->enableIfNot();
             break;
         case MqttConnectionServiceState::WaitingForWifi:
             this->setInterval(1 * TASK_SECOND);
-            this->setIterations(TASK_FOREVER);
             this->enableIfNot();
             break;
         default:

@@ -48,7 +48,7 @@ String statusToString(uint8_t status)
 }
 
 WifiConnectionService::WifiConnectionService(Scheduler* aScheduler)
-    : Task(TASK_IMMEDIATE, TASK_ONCE, aScheduler, false)
+    : Task(TASK_IMMEDIATE, TASK_FOREVER, aScheduler, false)
 {
     this->state = WifiConnectionServiceState::NotInitialized;
 }
@@ -94,12 +94,10 @@ bool WifiConnectionService::stateTransition(uint8_t wifiStatus)
     {
         case WifiConnectionServiceState::Connected:
             this->setInterval(30 * TASK_SECOND);
-            this->setIterations(TASK_FOREVER);
             this->enableIfNot();
             break;
         case WifiConnectionServiceState::Connecting:
             this->setInterval(10 * TASK_SECOND);
-            this->setIterations(TASK_FOREVER);
             this->enableIfNot();
             break;
         default:
