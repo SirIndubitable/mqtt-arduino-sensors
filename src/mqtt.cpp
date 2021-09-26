@@ -1,67 +1,129 @@
 #include "common.h"
 #include "secrets.h"
+#include "mqttTask.h"
 
-void waitForWifi();
-void tryConnectMqtt();
-void monitorMqttConnection();
-
-Task waitForWifiTask(1 * TASK_SECOND,  TASK_FOREVER, waitForWifi,           &runner, true);
-Task mqttConnectTask(5 * TASK_SECOND,  TASK_FOREVER, tryConnectMqtt,        &runner, false);
-Task mqttMonitorTask(30 * TASK_SECOND, TASK_FOREVER, monitorMqttConnection, &runner, false);
-
-bool mqtt_state_transition()
+enum class MqttTaskState
 {
-    // If we have no wifi, go to the waiting for wifi task
-    if (WiFi.status() != wl_status_t::WL_CONNECTED)
-    {
-        mqttConnectTask.disable();
-        mqttMonitorTask.disable();
-        return !waitForWifiTask.enableIfNot();
-    }
+    NotInitialized,
+    Error,
+    Connected,
+    Connecting,
+    WaitingForWifi
+};
 
-    // If we've connected to mqtt, just monitor the connection for downtime
-    if (mqttClient.connected())
-    {
-        waitForWifiTask.disable();
-        mqttConnectTask.disable();
-        return !mqttMonitorTask.enableIfNot();
-    }
-
-    // If we have wifi, but aren't connected to mqtt, we should probably try to connect
-    waitForWifiTask.disable();
-    mqttMonitorTask.disable();
-    return !mqttConnectTask.enableIfNot();
+MqttTask::MqttTask(Scheduler* aScheduler, WifiTask* wifiTask, PubSubClient* mqttClient)
+: Task(TASK_IMMEDIATE, TASK_ONCE, aScheduler, false)
+{
+    this->state = MqttTaskState::NotInitialized;
+    this->wifiTask = wifiTask;
+    this->mqttClient = mqttClient;
 }
 
-void waitForWifi()
+void MqttTask::Init(const char* hostname, uint8_t port, const char* client_id, const char* username, const char* password)
 {
-    mqtt_state_transition();
+    this->mqttClient->setServer(hostname, port);
+    this->client_id = client_id;
+    this->username = username;
+    this->password = password;
 }
 
-void tryConnectMqtt()
+bool MqttTask::Callback()
+{
+    switch (this->state)
+    {
+        case MqttTaskState::Connected:
+            this->monitor();
+            break;
+        case MqttTaskState::Connecting:
+            this->tryConnect();
+            break;
+        case MqttTaskState::WaitingForWifi:
+            this->waitForWifi();
+            break;
+        default:
+            break;
+    }
+
+    return true;
+}
+
+MqttTaskState MqttTask::getNewState()
+{
+    if (!this->wifiTask->IsConnected())
+    {
+        return MqttTaskState::WaitingForWifi;
+    }
+    if (this->mqttClient->connected())
+    {
+        return MqttTaskState::Connected;
+    }
+
+    return MqttTaskState::Connecting;
+}
+
+bool MqttTask::stateTransition()
+{
+    auto newState = this->getNewState();
+    if (this->state == newState)
+    {
+        return false;
+    }
+
+    this->state = newState;
+    switch (this->state)
+    {
+        case MqttTaskState::Connected:
+            this->setInterval(30 * TASK_SECOND);
+            this->setIterations(TASK_FOREVER);
+            this->enableIfNot();
+            break;
+        case MqttTaskState::Connecting:
+            this->setInterval(5 * TASK_SECOND);
+            this->setIterations(TASK_FOREVER);
+            this->enableIfNot();
+            break;
+        case MqttTaskState::WaitingForWifi:
+            this->setInterval(1 * TASK_SECOND);
+            this->setIterations(TASK_FOREVER);
+            this->enableIfNot();
+            break;
+        default:
+            this->disable();
+            break;
+    }
+
+    return true;
+}
+
+void MqttTask::waitForWifi()
+{
+    this->stateTransition();
+}
+
+void MqttTask::tryConnect()
 {
     DEBUG_TIME();
     DEBUG_SERIAL.println("Connecting to MQTT");
     DEBUG_SERIAL.print("   ");
-    DEBUG_SERIAL.println(MQTT_CLIENT_ID);
-    mqttClient.connect(MQTT_CLIENT_ID, MQTT_USERNAME, MQTT_PASSWORD);
+    DEBUG_SERIAL.println(this->client_id);
+    this->mqttClient->connect(this->client_id, this->username, this->password);
 
-    if (mqtt_state_transition())
+    if (this->stateTransition())
     {
         return;
     }
 
     DEBUG_TIME();
     DEBUG_SERIAL.print("mqtt failed, rc=");
-    DEBUG_SERIAL.println(mqttClient.state());
+    DEBUG_SERIAL.println(this->mqttClient->state());
 }
 
-void monitorMqttConnection()
+void MqttTask::monitor()
 {
-    if (mqtt_state_transition())
+    if (this->stateTransition())
     {
         DEBUG_TIME();
         DEBUG_SERIAL.print("mqtt failed, rc=");
-        DEBUG_SERIAL.println(mqttClient.state());
+        DEBUG_SERIAL.println(this->mqttClient->state());
     }
 }

@@ -8,6 +8,7 @@
 #include "DHT.h"
 
 #include "wifiTask.h"
+#include "mqttTask.h"
 
 #ifdef GARAGE_DOOR_SENSOR
 GarageSensor garage_sensor(PIN_A1, PIN_A7);
@@ -24,6 +25,7 @@ WiFiClient wificlient;
 PubSubClient mqttClient(wificlient);
 
 WifiTask wifi(&runner);
+MqttTask mqtt(&runner, &wifi, &mqttClient);
 
 void setup()
 {
@@ -43,7 +45,7 @@ void setup()
     #endif
 
     wifi.Init("MyArduino");
-    mqttClient.setServer(MQTT_HOST, MQTT_PORT);
+    mqtt.Init(MQTT_HOST, MQTT_PORT, MQTT_CLIENT_ID, MQTT_USERNAME, MQTT_PASSWORD);
 
     runner.startNow();
 }
