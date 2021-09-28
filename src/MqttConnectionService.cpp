@@ -18,7 +18,7 @@ MqttConnectionService::MqttConnectionService(Scheduler* aScheduler, WifiConnecti
     this->mqttClient = mqttClient;
 }
 
-void MqttConnectionService::Init(const char* hostname, uint8_t port, const char* client_id, const char* username, const char* password)
+void MqttConnectionService::Init(const char* hostname, uint16_t port, const char* client_id, const char* username, const char* password)
 {
     this->mqttClient->setServer(hostname, port);
     this->client_id = client_id;

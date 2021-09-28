@@ -14,7 +14,7 @@ class MqttConnectionService : public Task
 {
     public:
         MqttConnectionService(Scheduler* aScheduler, WifiConnectionService* wifiService, PubSubClient* mqttClient);
-        void Init(const char* hostname, uint8_t port, const char* client_id, const char* username, const char* password);
+        void Init(const char* hostname, uint16_t port, const char* client_id, const char* username, const char* password);
         bool Callback();
     private:
         PubSubClient* mqttClient;
