@@ -20,5 +20,6 @@
 
 extern Scheduler runner;
 extern PubSubClient mqttClient;
+extern String baseTopic;
 
 #endif

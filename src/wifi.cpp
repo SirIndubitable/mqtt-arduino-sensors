@@ -72,4 +72,17 @@ void monitorWifi()
         DEBUG_TIME();
         DEBUG_SERIAL.println(status_tostring((wl_status_t)WiFi.status()));
     }
+    #ifdef PUBLISH_WIFI_RSSI
+    else
+    {
+        String rssi_topic = baseTopic + "/wifi/rssi";
+        char rssi[12];
+        itoa(WiFi.RSSI(), rssi, 10);
+        DEBUG_TIME();
+        DEBUG_SERIAL.print("Wifi RSSI: ");
+        DEBUG_SERIAL.print(rssi);
+        DEBUG_SERIAL.println(" dBm");
+        mqttClient.publish(rssi_topic.c_str(), rssi);
+    }
+    #endif
 }

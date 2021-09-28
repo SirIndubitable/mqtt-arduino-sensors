@@ -42,6 +42,8 @@ void tryConnectMqtt()
 {
     DEBUG_TIME();
     DEBUG_SERIAL.println("Connecting to MQTT");
+    DEBUG_SERIAL.print("   ");
+    DEBUG_SERIAL.println(MQTT_CLIENT_ID);
     mqttClient.connect(MQTT_CLIENT_ID, MQTT_USERNAME, MQTT_PASSWORD);
 
     if (mqtt_state_transition())
