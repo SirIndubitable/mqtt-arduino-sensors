@@ -23,6 +23,10 @@ WifiRssiSensor::WifiRssiSensor(Scheduler* aScheduler, PubSubClient* mqttClient)
 {
 }
 
+void WifiRssiSensor::Init()
+{
+}
+
 uint32_t WifiRssiSensor::OnMqttConnected()
 {
     this->PublishMessage(WIFI_CONFIG_TOPIC, WIFI_CONFIG_DATA);

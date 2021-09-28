@@ -13,6 +13,7 @@ class MqttSensor : public Task
     public:
         MqttSensor(Scheduler* aScheduler, PubSubClient* mqttClient);
         bool Callback();
+        virtual void Init() = 0;
     protected:
         bool PublishMessage(const char* topic, const char* payload);
         virtual uint32_t OnMqttConnected() = 0;
