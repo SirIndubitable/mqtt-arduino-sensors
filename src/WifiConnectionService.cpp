@@ -33,17 +33,17 @@ String statusToString(uint8_t status)
         case WL_CONNECTED:
             return "Wifi connected";
         case WL_NO_SHIELD:
-            return "no wifi shield";
+            return "No wifi shield";
         case WL_IDLE_STATUS:
-            return "wifi idle";
+            return "Wifi idle";
         case WL_CONNECT_FAILED:
-            return "wifi connect failed";
+            return "Wifi connect failed";
         case WL_CONNECTION_LOST:
-            return "wifi connection lost";
+            return "Wifi connection lost";
         case WL_DISCONNECTED:
-            return "wifi disconnected";
+            return "Wifi disconnected";
         default:
-            return "wifi other";
+            return "Wifi unknown error";
     }
 }
 
@@ -55,7 +55,7 @@ WifiConnectionService::WifiConnectionService(Scheduler* aScheduler)
 
 void WifiConnectionService::Init(String hostname)
 {
-    WiFi.setHostname("MyArduino");
+    WiFi.setHostname(hostname.c_str());
     this->stateTransition(WiFi.status());
 }
 
@@ -89,6 +89,8 @@ bool WifiConnectionService::stateTransition(uint8_t wifiStatus)
         return false;
     }
 
+    DEBUG_TIME();
+    DEBUG_SERIAL.println(statusToString(wifiStatus));
     this->state = newState;
     switch (this->state)
     {
@@ -110,9 +112,6 @@ bool WifiConnectionService::stateTransition(uint8_t wifiStatus)
 
 void WifiConnectionService::tryConnect()
 {
-    DEBUG_TIME();
-    DEBUG_SERIAL.println("Connecting to Wifi");
-
     auto status = WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
     if (this->stateTransition(status))
@@ -128,9 +127,5 @@ void WifiConnectionService::tryConnect()
 void WifiConnectionService::monitor()
 {
     auto status = WiFi.status();
-    if (this->stateTransition(status))
-    {
-        DEBUG_TIME();
-        DEBUG_SERIAL.println(statusToString(status));
-    }
+    this->stateTransition(status);
 }

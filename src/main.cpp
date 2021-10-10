@@ -58,7 +58,7 @@ void setup()
         sensors[i]->Init();
     }
 
-    wifiService.Init("MyArduino");
+    wifiService.Init(SENSOR_UNIQUE_NAME);
     mqttService.Init(MQTT_HOST, MQTT_PORT, MQTT_CLIENT_ID, MQTT_USERNAME, MQTT_PASSWORD);
 
     runner.startNow();

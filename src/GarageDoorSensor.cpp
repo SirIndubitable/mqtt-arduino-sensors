@@ -12,7 +12,7 @@
 #define OPEN_CONFIG_TOPIC "homeassistant/binary-sensor/" SENSOR_UNIQUE_NAME "-open/config"
 #define OPEN_CONFIG_DATA \
 "{ " \
-"\"name\": \"Garage Door Open\", " \
+"\"name\": \"" SENSOR_UNIQUE_NAME " Garage Door Open\", " \
 "\"dev_cla\": \"garage_door\", " \
 "\"stat_t\": \"" GDOOR_STATE_TOPIC "\", " \
 "\"val_tpl\": \"{{ value_json.garage_door }}\" " \
@@ -21,7 +21,7 @@
 #define MOVING_CONFIG_TOPIC "homeassistant/binary-sensor/" SENSOR_UNIQUE_NAME "-moving/config"
 #define MOVING_CONFIG_DATA \
 "{ " \
-"\"name\": \"Garage Door Moving\", " \
+"\"name\": \"" SENSOR_UNIQUE_NAME " Garage Door Moving\", " \
 "\"dev_cla\": \"moving\", " \
 "\"stat_t\": \"" GDOOR_STATE_TOPIC "\", " \
 "\"val_tpl\": \"{{ value_json.moving }}\" " \

@@ -12,7 +12,7 @@
 #define WIFI_CONFIG_TOPIC "homeassistant/sensor/" SENSOR_UNIQUE_NAME "-wifi/config"
 #define WIFI_CONFIG_DATA \
 "{ " \
-"\"name\": \"Wifi Strength\", " \
+"\"name\": \"" SENSOR_UNIQUE_NAME " Wifi Strength\", " \
 "\"dev_cla\": \"signal_strength\", " \
 "\"stat_t\": \"" WIFI_STATE_TOPIC "\", " \
 "\"unit_of_meas\": \"dBm\", " \

@@ -12,7 +12,7 @@
 #define TEMPERATURE_CONFIG_TOPIC "homeassistant/sensor/" SENSOR_UNIQUE_NAME "-temp/config"
 #define TEMPERATURE_CONFIG_DATA \
 "{ " \
-"\"name\": \"Temperature\", " \
+"\"name\": \"" SENSOR_UNIQUE_NAME " Temperature\", " \
 "\"dev_cla\": \"temperature\", " \
 "\"stat_t\": \"" CLIMATE_STATE_TOPIC "\", " \
 "\"unit_of_meas\": \"°F\", " \
@@ -22,7 +22,7 @@
 #define HUMIDITY_CONFIG_TOPIC "homeassistant/sensor/" SENSOR_UNIQUE_NAME "-humid/config"
 #define HUMIDITY_CONFIG_DATA \
 "{ " \
-"\"name\": \"Humidity\", " \
+"\"name\": \"" SENSOR_UNIQUE_NAME " Humidity\", " \
 "\"dev_cla\": \"humidity\", " \
 "\"stat_t\": \"" CLIMATE_STATE_TOPIC "\", " \
 "\"unit_of_meas\": \"%\", " \
