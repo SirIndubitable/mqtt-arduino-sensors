@@ -41,7 +41,11 @@ void MqttSensor::StateTransition(MqttSensorState newState)
     {
         case MqttSensorState::Connected:
         {
+            // The On connected sends a lot of data over wifi as it configures the sensor
+            // Disable the task scheduling so that it can finish before we are scheduled again
+            this->disable();
             auto newInterval = this->OnMqttConnected();
+            this->enable();
             if (this->mqttState != MqttSensorState::Connected)
             {
                 // If calling this->OnMqttConnected() transitioned states, don't keep
@@ -49,7 +53,6 @@ void MqttSensor::StateTransition(MqttSensorState newState)
                 break;
             }
             this->setInterval(newInterval);
-            this->enableIfNot();
             break;
         }
         case MqttSensorState::Waiting:
