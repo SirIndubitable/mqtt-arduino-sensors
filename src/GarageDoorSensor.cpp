@@ -6,22 +6,22 @@
 #define SENSOR_UNIQUE_NAME "example-name"
 #endif
 
-#define GDOOR_STATE_TOPIC "homeassistant/binary-sensor/" SENSOR_UNIQUE_NAME "-gdoor/state"
+#define GDOOR_STATE_TOPIC "homeassistant/binary_sensor/" SENSOR_UNIQUE_NAME "-gdoor/state"
 #define STATE_DATA_FORMAT "{ \"moving\": %s, \"garage_door\": %s }"
 
-#define OPEN_CONFIG_TOPIC "homeassistant/binary-sensor/" SENSOR_UNIQUE_NAME "-open/config"
+#define OPEN_CONFIG_TOPIC "homeassistant/binary_sensor/" SENSOR_UNIQUE_NAME "-open/config"
 #define OPEN_CONFIG_DATA \
 "{ " \
-"\"name\": \"" SENSOR_UNIQUE_NAME " Garage Door Open\", " \
+"\"name\": \"" SENSOR_UNIQUE_NAME " Open\", " \
 "\"dev_cla\": \"garage_door\", " \
 "\"stat_t\": \"" GDOOR_STATE_TOPIC "\", " \
 "\"val_tpl\": \"{{ value_json.garage_door }}\" " \
 "}"
 
-#define MOVING_CONFIG_TOPIC "homeassistant/binary-sensor/" SENSOR_UNIQUE_NAME "-moving/config"
+#define MOVING_CONFIG_TOPIC "homeassistant/binary_sensor/" SENSOR_UNIQUE_NAME "-moving/config"
 #define MOVING_CONFIG_DATA \
 "{ " \
-"\"name\": \"" SENSOR_UNIQUE_NAME " Garage Door Moving\", " \
+"\"name\": \"" SENSOR_UNIQUE_NAME " Moving\", " \
 "\"dev_cla\": \"moving\", " \
 "\"stat_t\": \"" GDOOR_STATE_TOPIC "\", " \
 "\"val_tpl\": \"{{ value_json.moving }}\" " \
