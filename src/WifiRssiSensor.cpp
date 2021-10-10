@@ -15,7 +15,7 @@
 "\"name\": \"" SENSOR_UNIQUE_NAME " Wifi Strength\", " \
 "\"dev_cla\": \"signal_strength\", " \
 "\"stat_t\": \"" WIFI_STATE_TOPIC "\", " \
-"\"unit_of_meas\": \"dBm\", " \
+"\"unit_of_meas\": \"dBm\"" \
 "}"
 
 WifiRssiSensor::WifiRssiSensor(Scheduler* aScheduler, PubSubClient* mqttClient)
