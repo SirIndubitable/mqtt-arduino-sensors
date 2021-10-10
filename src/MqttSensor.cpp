@@ -69,11 +69,14 @@ bool MqttSensor::PublishMessage(const char* topic, const char* payload)
     DEBUG_TIME();
     DEBUG_SERIAL.print(topic);
     DEBUG_SERIAL.print(": ");
-    DEBUG_SERIAL.println(payload);
+    DEBUG_SERIAL.print(payload);
+    DEBUG_SERIAL.println();
 
     auto success = this->mqttClient->publish(topic, payload, true);
     if (!success)
     {
+        DEBUG_TIME();
+        DEBUG_SERIAL.println("Publish failed");
         this->StateTransition(MqttSensorState::Waiting);
     }
 

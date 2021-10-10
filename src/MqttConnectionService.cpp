@@ -10,6 +10,35 @@ enum class MqttConnectionServiceState
     WaitingForWifi
 };
 
+void _print_mqtt_state(int32_t state)
+{
+    switch(state)
+    {
+        case 0:
+            DEBUG_SERIAL.print("Connection Accepted");
+            break;
+        case -1:
+            DEBUG_SERIAL.print("Protocall verion denied");
+            break;
+        case -2:
+            DEBUG_SERIAL.print("Id rejected");
+            break;
+        case -3:
+            DEBUG_SERIAL.print("Service unavailable");
+            break;
+        case -4:
+            DEBUG_SERIAL.print("Invalid credentials");
+            break;
+        case -5:
+            DEBUG_SERIAL.print("Client not authorized");
+            break;
+        default:
+            DEBUG_SERIAL.print("Unkown error: ");
+            DEBUG_SERIAL.print(state);
+            break;
+    }
+}
+
 MqttConnectionService::MqttConnectionService(Scheduler* aScheduler, WifiConnectionService* wifiService, PubSubClient* mqttClient)
 : Task(TASK_IMMEDIATE, TASK_FOREVER, aScheduler, false)
 {
@@ -79,8 +108,8 @@ bool MqttConnectionService::stateTransition()
             this->enableIfNot();
             break;
         case MqttConnectionServiceState::Connecting:
-            // Don't print state transition information because every
-            // Loop it specifies connection info
+            DEBUG_TIME();
+            DEBUG_SERIAL.println("MQTT Service - Connecting");
             this->setInterval(5 * TASK_SECOND);
             this->enableIfNot();
             break;
@@ -116,15 +145,18 @@ void MqttConnectionService::tryConnect()
         return;
     }
 
-    DEBUG_SERIAL.print("       rc=");
-    DEBUG_SERIAL.println(this->mqttClient->state());
+    _print_mqtt_state(this->mqttClient->state());
+    DEBUG_SERIAL.println();
 }
 
 void MqttConnectionService::monitor()
 {
-    if (this->stateTransition())
+    auto status = this->mqttClient->state();
+    if (status < 0)
     {
-        DEBUG_SERIAL.print("       rc=");
-        DEBUG_SERIAL.println(this->mqttClient->state());
+        _print_mqtt_state(status);
+        DEBUG_SERIAL.println();
     }
+
+    this->stateTransition();
 }
