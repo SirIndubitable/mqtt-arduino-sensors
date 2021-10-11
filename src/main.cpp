@@ -20,6 +20,10 @@
 #include "WifiRssiSensor.h"
 #endif
 
+#ifdef KEG_SENSOR
+#include "KegScale.h"
+#endif
+
 Scheduler runner;
 WiFiClient wificlient;
 PubSubClient mqttClient(wificlient);
@@ -39,6 +43,10 @@ MqttSensor* sensors[]
 
     #ifdef PUBLISH_WIFI_RSSI
     new WifiRssiSensor(&runner, &mqttClient),
+    #endif
+
+    #ifdef KEG_SENSOR
+    new KegScaleSensor(&runner, &mqttClient, data_pin, clock_pin, led_pin, low_cal_pin, high_cal_pin),
     #endif
 };
 
