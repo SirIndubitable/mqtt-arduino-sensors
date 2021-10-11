@@ -8,27 +8,27 @@ SENSOR_UNIQUE_NAME="example-name"
 
 # Garage Door Sensor
 
-homeassistant/binary-sensor/example-name-open/config
+homeassistant/binary_sensor/example-name-open/config
 ```json
 {
-    "name": "Garage Door Open",
+    "name": "example-name Open",
     "dev_cla": "garage_door",
-    "stat_t": "homeassistant/binary-sensor/example-name-gdoor/state",
+    "stat_t": "homeassistant/binary_sensor/example-name-gdoor/state",
     "val_tpl": "{{ value_json.garage_door }}",
 }
 ```
 
-homeassistant/binary-sensor/example-name-moving/config
+homeassistant/binary_sensor/example-name-moving/config
 ```json
 {
-    "name": "Garage Door Moving",
+    "name": "example-name Moving",
     "dev_cla": "moving",
-    "stat_t": "homeassistant/binary-sensor/example-name-gdoor/state",
+    "stat_t": "homeassistant/binary_sensor/example-name-gdoor/state",
     "val_tpl": "{{ value_json.moving }}",
 }
 ```
 
-homeassistant/binary-sensor/example-name-gdoor/state
+homeassistant/binary_sensor/example-name-gdoor/state
 ```json
 {
     "moving": true,
@@ -42,7 +42,7 @@ homeassistant/binary-sensor/example-name-gdoor/state
 homeassistant/sensor/example-name-temp/config
 ```json
 {
-    "name": "Temperature",
+    "name": "example-name Temperature",
     "dev_cla": "temperature",
     "stat_t": "homeassistant/sensor/example-name-climate/state",
     "unit_of_meas": "°F",
@@ -53,7 +53,7 @@ homeassistant/sensor/example-name-temp/config
 homeassistant/sensor/example-name-humid/config
 ```json
 {
-    "name": "Humidity",
+    "name": "example-name Humidity",
     "dev_cla": "humidity",
     "stat_t": "homeassistant/sensor/example-name-climate/state",
     "unit_of_meas": "%",
@@ -76,9 +76,10 @@ homeassistant/sensor/example-name-climate/state
 homeassistant/sensor/example-name-wifi/config
 ```json
 {
-    "name": "Wifi Strength",
+    "name": "example-name Wifi Strength",
     "dev_cla": "signal_strength",
-    "stat_t": "homeassistant/sensor/example-name-wifi/state"
+    "stat_t": "homeassistant/sensor/example-name-wifi/state",
+    "unit_of_meas": "dBm"
 }
 ```
 
