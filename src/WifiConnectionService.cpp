@@ -55,6 +55,7 @@ WifiConnectionService::WifiConnectionService(Scheduler* aScheduler)
 
 void WifiConnectionService::Init(String hostname)
 {
+    pinMode(LED_BUILTIN, PinMode::OUTPUT);
     WiFi.setHostname(hostname.c_str());
     this->stateTransition(WiFi.status());
 }
@@ -95,11 +96,13 @@ bool WifiConnectionService::stateTransition(uint8_t wifiStatus)
     switch (this->state)
     {
         case WifiConnectionServiceState::Connected:
-            this->setInterval(30 * TASK_SECOND);
+            digitalWrite(LED_BUILTIN, PinStatus::HIGH);
+            this->setInterval(15 * TASK_SECOND);
             this->enableIfNot();
             break;
         case WifiConnectionServiceState::Connecting:
-            this->setInterval(10 * TASK_SECOND);
+            digitalWrite(LED_BUILTIN, PinStatus::LOW);
+            this->setInterval(5 * TASK_SECOND);
             this->enableIfNot();
             break;
         default:
@@ -126,6 +129,8 @@ void WifiConnectionService::tryConnect()
 
 void WifiConnectionService::monitor()
 {
+    auto led_status = digitalRead(LED_BUILTIN);
+    digitalWrite(LED_BUILTIN, led_status == PinStatus::LOW ? PinStatus::HIGH : PinStatus::LOW);
     auto status = WiFi.status();
     this->stateTransition(status);
 }
