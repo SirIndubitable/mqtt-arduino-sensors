@@ -20,6 +20,10 @@
 #include "WifiRssiSensor.h"
 #endif
 
+#ifdef SECURITY_SENSOR
+#include "SecuritySensor.h"
+#endif
+
 Scheduler runner;
 WiFiClient wificlient;
 PubSubClient mqttClient(wificlient);
@@ -39,6 +43,10 @@ MqttSensor* sensors[]
 
     #ifdef PUBLISH_WIFI_RSSI
     new WifiRssiSensor(&runner, &mqttClient),
+    #endif
+
+    #ifdef SECURITY_SENSOR
+    new SecuritySensor(&runner, &mqttClient, new[] { PIN_A1, PIN_A2, PIN_A3, PIN_A4, PIN_A5, PIN_A6 }),
     #endif
 };
 
