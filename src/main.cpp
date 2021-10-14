@@ -47,10 +47,12 @@ void setup()
 {
     Serial.begin(9600);
 
+    #if DEBUG
     while (!Serial)
     {
         delay(1 * TASK_SECOND);
     }
+    #endif
 
     uint8_t num_sensors = sizeof(sensors)/sizeof(sensors[0]);
     for (uint8_t i=0; i<num_sensors; i++)
