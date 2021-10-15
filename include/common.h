@@ -15,4 +15,6 @@
             DEBUG_SERIAL.print(": "); \
         }
 
+#define BOOL_STR(x) x ? "true" : "false"
+
 #endif

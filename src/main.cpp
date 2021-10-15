@@ -31,6 +31,16 @@ PubSubClient mqttClient(wificlient);
 WifiConnectionService wifiService(&runner);
 MqttConnectionService mqttService(&runner, &wifiService, &mqttClient);
 
+
+
+#ifdef SECURITY_SENSOR
+pin_size_t security_pins[] = { PIN_A1, PIN_A2, PIN_A3, PIN_A4, PIN_A5, PIN_A6 };
+SecuritySensor security_sensor(&runner, &mqttClient, security_pins);
+MqttSensor* sensors[]
+{
+    &security_sensor,
+};
+#elif
 MqttSensor* sensors[]
 {
     #ifdef GARAGE_DOOR_SENSOR
@@ -44,12 +54,8 @@ MqttSensor* sensors[]
     #ifdef PUBLISH_WIFI_RSSI
     new WifiRssiSensor(&runner, &mqttClient),
     #endif
-
-    #ifdef SECURITY_SENSOR
-    new SecuritySensor(&runner, &mqttClient, new[] { PIN_A1, PIN_A2, PIN_A3, PIN_A4, PIN_A5, PIN_A6 }),
-    #endif
 };
-
+#endif
 
 void setup()
 {
