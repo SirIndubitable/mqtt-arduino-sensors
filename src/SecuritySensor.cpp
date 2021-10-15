@@ -6,11 +6,10 @@
 #define SENSOR_UNIQUE_NAME "example-name"
 #endif
 
-#if _SECURITY_ZONE_COUNT == 6
-
 #define SECURITY_STATE_TOPIC "homeassistant/binary_sensor/" SENSOR_UNIQUE_NAME "/state"
-#define ZONE_DATA_FORMAT "{ \"z1\": \"%s\", \"z2\": \"%s\", \"z3\": \"%s\", \"z4\": \"%s\", \"z5\": \"%s\", \"z6\": \"%s\" }"
 
+#if _SECURITY_ZONE_COUNT == 6
+#define ZONE_DATA_FORMAT "{ \"z1\": \"%s\", \"z2\": \"%s\", \"z3\": \"%s\", \"z4\": \"%s\", \"z5\": \"%s\", \"z6\": \"%s\" }"
 #endif
 
 #define ZONE_CONFIG_TOPIC_FORMAT "homeassistant/binary_sensor/" SENSOR_UNIQUE_NAME "-z%u/config"
