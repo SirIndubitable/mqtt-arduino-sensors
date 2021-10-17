@@ -63,7 +63,7 @@ void SecuritySensor::ReadAndPublish()
     bool changes = false;
     for (uint8_t i = 0; i < _SECURITY_ZONE_COUNT; i++)
     {
-        cur_val = digitalRead(this->zone_pins[i]) == PinStatus::LOW;
+        cur_val = digitalRead(this->zone_pins[i]) == PinStatus::HIGH;
         changes |= cur_val != this->zone_last_val[i];
         this->zone_last_val[i] = cur_val;
     }
