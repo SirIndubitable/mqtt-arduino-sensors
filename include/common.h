@@ -15,6 +15,6 @@
             DEBUG_SERIAL.print(": "); \
         }
 
-#define BOOL_STR(x) x ? "true" : "false"
+#define BOOL_MQTT_STR(x) x ? "ON" : "OFF"
 
 #endif

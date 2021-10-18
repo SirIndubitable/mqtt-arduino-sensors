@@ -73,17 +73,17 @@ void SecuritySensor::ReadAndPublish()
         return;
     }
 
-    auto zone_len = strlen(ZONE_DATA_FORMAT) + (_SECURITY_ZONE_COUNT * 3) + 1;
+    auto zone_len = strlen(ZONE_DATA_FORMAT) + (_SECURITY_ZONE_COUNT * 1) + 1;
     char payload[zone_len];
     sprintf(
         payload,
         ZONE_DATA_FORMAT,
-        BOOL_STR(this->zone_last_val[0]),
-        BOOL_STR(this->zone_last_val[1]),
-        BOOL_STR(this->zone_last_val[2]),
-        BOOL_STR(this->zone_last_val[3]),
-        BOOL_STR(this->zone_last_val[4]),
-        BOOL_STR(this->zone_last_val[5]));
+        BOOL_MQTT_STR(this->zone_last_val[0]),
+        BOOL_MQTT_STR(this->zone_last_val[1]),
+        BOOL_MQTT_STR(this->zone_last_val[2]),
+        BOOL_MQTT_STR(this->zone_last_val[3]),
+        BOOL_MQTT_STR(this->zone_last_val[4]),
+        BOOL_MQTT_STR(this->zone_last_val[5]));
 
     this->PublishMessage(SECURITY_STATE_TOPIC, payload);
 }
