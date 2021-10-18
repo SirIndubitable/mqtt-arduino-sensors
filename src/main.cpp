@@ -18,7 +18,7 @@ MqttConnectionService mqttService(&runner, &wifiService, &mqttClient);
 #if defined(SECURITY_SENSOR)
 
 #include "SecuritySensor.h"
-pin_size_t security_pins[] = { PIN_A1, PIN_A2, PIN_A3, PIN_A4, PIN_A5, PIN_A6 };
+pin_size_t security_pins[] = { 2u, 3u, 4u, 5u, 6u, 7u };
 SecuritySensor security_sensor(&runner, &mqttClient, security_pins);
 MqttSensor* sensors[]
 {
