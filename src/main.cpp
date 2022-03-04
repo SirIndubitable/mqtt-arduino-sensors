@@ -19,10 +19,9 @@ MqttConnectionService mqttService(&runner, &wifiService, &mqttClient);
 
 #include "SecuritySensor.h"
 pin_size_t security_pins[] = { 2u, 3u, 4u, 5u, 6u, 7u };
-SecuritySensor security_sensor(&runner, &mqttClient, security_pins);
 MqttSensor* sensors[]
 {
-    &security_sensor,
+    new SecuritySensor(&runner, &mqttClient, security_pins),
 };
 
 #elif defined(GARAGE_DOOR_SENSOR)
