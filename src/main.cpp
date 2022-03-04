@@ -8,18 +8,6 @@
 #include "WifiConnectionService.h"
 #include "MqttConnectionService.h"
 
-#ifdef GARAGE_DOOR_SENSOR
-#include "GarageDoorSensor.h"
-#endif
-
-#ifdef TEMPERATURE_SENSOR
-#include "ClimateSensor.h"
-#endif
-
-#ifdef PUBLISH_WIFI_RSSI
-#include "WifiRssiSensor.h"
-#endif
-
 Scheduler runner;
 WiFiClient wificlient;
 PubSubClient mqttClient(wificlient);
@@ -27,21 +15,29 @@ PubSubClient mqttClient(wificlient);
 WifiConnectionService wifiService(&runner);
 MqttConnectionService mqttService(&runner, &wifiService, &mqttClient);
 
+#if defined(SECURITY_SENSOR)
+
+#include "SecuritySensor.h"
+pin_size_t security_pins[] = { 2u, 3u, 4u, 5u, 6u, 7u };
 MqttSensor* sensors[]
 {
-    #ifdef GARAGE_DOOR_SENSOR
-    new GarageDoorSensor(&runner, &mqttClient, PIN_A1, PIN_A7),
-    #endif
-
-    #ifdef TEMPERATURE_SENSOR
-    new ClimateSensor(&runner, &mqttClient, 4u, DHT22),
-    #endif
-
-    #ifdef PUBLISH_WIFI_RSSI
-    new WifiRssiSensor(&runner, &mqttClient),
-    #endif
+    new SecuritySensor(&runner, &mqttClient, security_pins),
 };
 
+#elif defined(GARAGE_DOOR_SENSOR)
+
+#include "GarageDoorSensor.h"
+#include "ClimateSensor.h"
+#include "WifiRssiSensor.h"
+
+MqttSensor* sensors[]
+{
+    new GarageDoorSensor(&runner, &mqttClient, PIN_A1, PIN_A7),
+    new ClimateSensor(&runner, &mqttClient, 4u, DHT22),
+    new WifiRssiSensor(&runner, &mqttClient),
+};
+
+#endif
 
 void setup()
 {
